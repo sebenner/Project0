@@ -45,7 +45,6 @@ public class Bank {
 			while (true) {
 				System.out.print("Username: ");
 				username = scanner.nextLine();
-				//TODO check if username exists in database
 				if (!dai.usernameExists(username)) {
 					break;
 				}
