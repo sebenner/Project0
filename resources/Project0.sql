@@ -38,12 +38,9 @@ Insert Into bankUser
 values ('matt','pass2', 'e','Mathew Schweigardt','701 S. Nedderman Dr., Arlington, Texas 76019');
 
 
-
---create or replace procedure proc1 (username in varchar2, accId in number, accType in varchar2, 
 create or replace procedure proc1 (username in varchar2, accType in varchar2, 
                                     amount in number, status in varchar2)
 is
---declare
 accId number(10) := accIdSeq.nextVal;
 begin
 insert into customerAccounts values (username, accId);
@@ -52,12 +49,11 @@ end proc1;
 
 
 
-select * from bankUser;
+--select * from bankUser;
 
-select * from customerAccounts;
+--select * from customerAccounts;
 
-select * from userAccount;
+--select * from userAccount;
 
-select * from bankUser where username = 'sebenner';
 
 --commit;

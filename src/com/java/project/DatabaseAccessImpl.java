@@ -40,20 +40,14 @@ public class DatabaseAccessImpl implements DatabaseAccess{
 		st.setString(4, c.getFullName());
 		st.setString(5, c.getAddress());
 		st.executeUpdate();
-
-		//Statement st=con.createStatement();
-		//int rowcount = st.executeUpdate("insert into bankUser (username, passwrd, userType, fullName, address) values ('sebenner','ack','c','Steven Benner', '14507 Oakwood Pl Ne, Albuquerque, NM 87123')");
-		//con.commit();
 		con.close();
 	}
 	
 	@Override
 	public void addAccount(Customer c, Account a) throws SQLException {
 		Connection con=DriverManager.getConnection(url, username, password);
-		//con.prepareCall("call proc1(?,?,?,?,?)");
 		CallableStatement cs = con.prepareCall("call proc1(?,?,?,?)");
 		cs.setString(1, c.getUsername());
-		//cs.setInt(2, a.getAccountId());
 		cs.setString(2, a.getType());
 		cs.setDouble(3, a.getAmount());
 		cs.setString(4, a.getStatus());
@@ -61,17 +55,6 @@ public class DatabaseAccessImpl implements DatabaseAccess{
 		//con.commit();
 		con.close();
 		
-	}
-
-	/*@Override
-	public void setAmount(Account a) {
-		// TODO Auto-generated method stub
-		
-	}*/
-	
-	public static void main(String[] args) throws SQLException {
-		//DatabaseAccessImpl dai = new DatabaseAccessImpl();
-		//dai.addUser();
 	}
 
 	@Override
@@ -85,13 +68,8 @@ public class DatabaseAccessImpl implements DatabaseAccess{
 		Connection con=DriverManager.getConnection(url, username, password);
 		PreparedStatement st = con.prepareStatement("select * from bankUser where username = ?");
 		st.setString(1, username);
-		//st.setString(2, c.getPassword());
-		//st.setString(3, "c");
-		//st.setString(4, c.getFullName());
-		//st.setString(5, c.getAddress());
 		ResultSet output = st.executeQuery();
 		output.getString("username");
-		//st.executeUpdate();
 		return output.getString("username").isEmpty();
 	}
 

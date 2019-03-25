@@ -4,7 +4,6 @@ import java.sql.SQLException;
 //import java.util.List;
 
 public interface DatabaseAccess {
-//public void applyForAccount(Customer, );
 public void addUser(Customer c) throws SQLException;
 public void addAccount(Customer c, Account a) throws SQLException;
 public boolean login(String username, String password);
