@@ -16,7 +16,7 @@ public class DatabaseAccessImpl implements DatabaseAccess{
 	static {
 		try {
 			Properties property = new Properties();
-			property.load(new FileReader("C:\\Users\\steve\\eclipse-workspace-photon\\JavaDay9M\\src\\main\\resources\\project.properties"));
+			property.load(new FileReader("C:\\Users\\steve\\eclipse-workspace-photon\\Project0\\resources\\project.properties"));
 			System.out.println(property.getProperty("driver"));
 			url = property.getProperty("url");
 			username = property.getProperty("username");
@@ -63,17 +63,15 @@ public class DatabaseAccessImpl implements DatabaseAccess{
 		return false;
 	}
 
+	//Does not work correctly!!!
 	@Override
-	public boolean usernameExists(String username) throws SQLException {
+	public boolean usernameExists(String uName) throws SQLException {
 		Connection con=DriverManager.getConnection(url, username, password);
 		PreparedStatement st = con.prepareStatement("select * from bankUser where username = ?");
-		st.setString(1, username);
+		st.setString(1, uName);
 		ResultSet output = st.executeQuery();
-		output.getString("username");
-		return output.getString("username").isEmpty();
+		//con.close();
+		return output.next();//output.getString("username").isEmpty();
 	}
-
-
-
 
 }

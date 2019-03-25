@@ -1,7 +1,5 @@
 package com.java.project;
 
-import java.io.Serializable;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,8 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class CustomerAccount implements Serializable{
-	private static final long serialVersionUID = 1L;
+public class CustomerAccount {
 	private String username;
 	private int accountId;
 	

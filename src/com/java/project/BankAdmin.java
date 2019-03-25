@@ -8,7 +8,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class BankAdmin extends Employee{
-	private static final long serialVersionUID = 1L;
+	//private static final long serialVersionUID = 1L;
 
 	public BankAdmin(String username, String password, String name, String address) {
 		super(username, password, name, address);

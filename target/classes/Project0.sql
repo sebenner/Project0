@@ -49,11 +49,11 @@ end proc1;
 
 
 
-select * from bankUser;
+--select * from bankUser;
 
-select * from customerAccounts;
+--select * from customerAccounts;
 
-select * from userAccount;
+--select * from userAccount;
 
 
-commit;
+--commit;

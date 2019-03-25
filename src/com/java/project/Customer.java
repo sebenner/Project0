@@ -1,19 +1,13 @@
 package com.java.project;
 
-import java.io.Serializable;
-
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class Customer extends User implements Serializable{
-	private static final long serialVersionUID = 1L;
+public class Customer extends User{
 	//int ssn;
 	//initial deposit required to create account
-	 //public void viewAccountsOwned() {
-		 
-	 //}
 	public Customer(String username, String password, String fullName, String address) {
 		super(username, password, fullName, address);
 	}

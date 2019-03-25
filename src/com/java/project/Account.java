@@ -1,7 +1,5 @@
 package com.java.project;
 
-import java.io.Serializable;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -9,8 +7,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class Account implements Serializable{
-	private static final long serialVersionUID = 1L;
+public class Account{
 	private int accountId;
 	private String type; //  change to enum
 	private double amount;
@@ -34,7 +31,6 @@ public class Account implements Serializable{
 		}
 		else if (newAmount >= 0.0) {
 			amount = newAmount;
-			DatabaseAccessImpl dai = new DatabaseAccessImpl();
 		}
 		else {
 			throw new AccountException("You cannot withdraw more money than there is in the account.");
