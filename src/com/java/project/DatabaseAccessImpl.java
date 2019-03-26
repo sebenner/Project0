@@ -1,5 +1,6 @@
 package com.java.project;
 
+import java.io.*;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.CallableStatement;
@@ -11,9 +12,11 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
 
-public class DatabaseAccessImpl implements DatabaseAccess{
+public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 
-	static String url, username, password;
+	private static String url, username, password;
+	private static DatabaseAccessImpl obj;
+
 	static {
 		try {
 			Properties property = new Properties();
@@ -23,18 +26,20 @@ public class DatabaseAccessImpl implements DatabaseAccess{
 			username = property.getProperty("username");
 			password = property.getProperty("password");
 			Class.forName(property.getProperty("driver"));
-		}
-		catch (ClassNotFoundException e){
+		} catch (ClassNotFoundException e) {
 			System.out.println("Cannot find your driver class!");
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			System.out.println("Cannot read your property file!");
 		}
 	}
-	
+
+	private DatabaseAccessImpl() {
+	}
+
 	public void addUser(Customer c) throws SQLException {
-		Connection con=DriverManager.getConnection(url, username, password);
-		PreparedStatement st = con.prepareStatement("insert into bankUser (username, passwrd, userType, fullName, address) values (?,?,?,?,?)");
+		Connection con = DriverManager.getConnection(url, username, password);
+		PreparedStatement st = con.prepareStatement(
+				"insert into bankUser (username, passwrd, userType, fullName, address) values (?,?,?,?,?)");
 		st.setString(1, c.getUsername());
 		st.setString(2, c.getPassword());
 		st.setString(3, "c");
@@ -43,7 +48,7 @@ public class DatabaseAccessImpl implements DatabaseAccess{
 		st.executeUpdate();
 		con.close();
 	}
-	
+
 	@Override
 	public void addAccount(String uName1, String type, String uName2, Double amount) throws SQLException {
 		Connection con=DriverManager.getConnection(url, username, password);
@@ -53,34 +58,110 @@ public class DatabaseAccessImpl implements DatabaseAccess{
 		cs.setString(3, uName2);
 		cs.setDouble(4, amount);
 		cs.executeQuery();
-		//con.commit();
+		// con.commit();
 		con.close();
-		
+
 	}
 
 	@Override
 	public User login(String uName, String passwrd) throws SQLException {
-		Connection con=DriverManager.getConnection(url, username, password);
+		Connection con = DriverManager.getConnection(url, username, password);
 		PreparedStatement st = con.prepareStatement("select * from bankUser where username = ? and passwrd = ?");
 		st.setString(1, uName);
 		st.setString(2, passwrd);
 		ResultSet output = st.executeQuery();
 		if (output.next()) {
-			return User.getInstance(uName, passwrd, output.getString(3), output.getString(4), output.getString(5));
-		}
-		else {
+			User temp = User.getInstance(uName, passwrd, output.getString(3), output.getString(4), output.getString(5));
+			con.close();
+			return temp;
+		} else {
+			con.close();
 			return null;
 		}
 	}
 
 	@Override
 	public boolean usernameExists(String uName) throws SQLException {
-		Connection con=DriverManager.getConnection(url, username, password);
+		Connection con = DriverManager.getConnection(url, username, password);
 		PreparedStatement st = con.prepareStatement("select * from bankUser where username = ?");
 		st.setString(1, uName);
 		ResultSet output = st.executeQuery();
-		//con.close();
-		return output.next();//output.getString("username").isEmpty();
+		// con.close();
+		return output.next();// output.getString("username").isEmpty();
+	}
+
+	@Override
+	public boolean withdraw(float amount, int accountNum) throws SQLException {
+		Connection con = DriverManager.getConnection(url, username, password);
+		PreparedStatement st = con.prepareStatement("select amount from useraccount where acid = ?");
+		st.setInt(1, accountNum);
+		ResultSet output = st.executeQuery();
+		float balance = 0;
+
+		if (output.next()) {
+			balance = output.getFloat("amount");
+		} else {
+			System.out.println("Account balance not found");
+		}
+
+		if (balance != 0) {
+			balance = balance - amount;
+			st = con.prepareStatement("update useraccount set amount=? where acid=?");
+			st.setFloat(1, balance);
+			st.setInt(2, accountNum);
+			st.executeUpdate();
+			return true;
+		} else {
+			System.out.println("Account balance 0");
+		}
+		con.close();
+		return false;
+	}
+
+	@Override
+	public boolean deposit(float amount, int accountNum) throws SQLException {
+		Connection con = DriverManager.getConnection(url, username, password);
+		PreparedStatement st = con.prepareStatement("select amount from useraccount where acid = ?");
+		st.setInt(1, accountNum);
+		ResultSet output = st.executeQuery();
+		float balance = 0;
+
+		if (output.next()) {
+			balance = output.getFloat("amount");
+		} else {
+			System.out.println("Account balance not found");
+		}
+
+		if (balance != 0) {
+			balance = balance + amount;
+			st = con.prepareStatement("update useraccount set amount=? where acid=?");
+			st.setFloat(1, balance);
+			st.setInt(2, accountNum);
+			st.executeUpdate();
+			return true;
+		} else {
+			System.out.println("Account balance 0");
+		}
+		con.close();
+		return false;
+	}
+
+
+	// Singleton necessities:
+	public static DatabaseAccessImpl getInstance() {
+		if (obj == null) {
+			synchronized (DatabaseAccessImpl.class) {
+				if (obj == null) {
+					obj = new DatabaseAccessImpl();
+				}
+			}
+		}
+		return obj;
+	}
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		return obj;
 	}
 
 	@Override
