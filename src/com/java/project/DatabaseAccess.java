@@ -6,7 +6,7 @@ import java.sql.SQLException;
 public interface DatabaseAccess {
 public void addUser(Customer c) throws SQLException;
 public void addAccount(Customer c, Account a) throws SQLException;
-public boolean login(String username, String password);
+public User login(String username, String password) throws SQLException;
 public boolean usernameExists(String username) throws SQLException;
 //public void setAmount(Account a);
 /*public void withdraw();

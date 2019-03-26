@@ -18,13 +18,23 @@ public class Customer extends User{
 
 	@Override
 	public void printMainMenu() {
-		// TODO Auto-generated method stub
-		
+		System.out.println("1. Apply for Account");
+		System.out.println("2. Withdraw");
+		System.out.println("3. Deposit");
+		System.out.println("4. Transfer");
+		System.out.println("5. View Personal Information");
+		System.out.println("6. View Account Balances");
+		System.out.println("7. View Account Information");
+		System.out.println("8. Exit");
 	}
 
 	@Override
-	public int menuItemNumber() {
-		// TODO Auto-generated method stub
-		return 0;
+	public int menuItemNumber(int x) throws MainMenuException {
+		if(x<9) {
+			return x;
+		}
+		else {
+			throw new MainMenuException("Nope");
+		}
 	}
 }

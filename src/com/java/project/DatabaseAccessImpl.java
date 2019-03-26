@@ -58,12 +58,20 @@ public class DatabaseAccessImpl implements DatabaseAccess{
 	}
 
 	@Override
-	public boolean login(String username, String password) {
-		// TODO Auto-generated method stub
-		return false;
+	public User login(String uName, String passwrd) throws SQLException {
+		Connection con=DriverManager.getConnection(url, username, password);
+		PreparedStatement st = con.prepareStatement("select * from bankUser where username = ? and passwrd = ?");
+		st.setString(1, uName);
+		st.setString(2, passwrd);
+		ResultSet output = st.executeQuery();
+		if (output.next()) {
+			return User.getInstance(uName, passwrd, output.getString(3), output.getString(4), output.getString(5));
+		}
+		else {
+			return null;
+		}
 	}
 
-	//Does not work correctly!!!
 	@Override
 	public boolean usernameExists(String uName) throws SQLException {
 		Connection con=DriverManager.getConnection(url, username, password);

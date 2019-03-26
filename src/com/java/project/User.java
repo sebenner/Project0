@@ -20,7 +20,20 @@ abstract public class User /*implements Serializable*/{
 	
 	abstract public void printMainMenu();
 	
-	abstract public int menuItemNumber();
+	abstract public int menuItemNumber(int x) throws MainMenuException;
+	
+	public static User getInstance(String username, String password, String type, String fullName, String address) {
+		switch (type) {
+		case "c":
+			return new Customer(username, password, fullName, address);
+		case "e":
+			return new Employee(username, password, fullName, address);
+		case "b":
+			return new BankAdmin(username, password, fullName, address);
+		
+		}
+		return null;
+	}
 	
 	@Override
 	public int hashCode() {

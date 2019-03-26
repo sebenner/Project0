@@ -55,5 +55,6 @@ select * from customerAccounts;
 
 select * from userAccount;
 
+--select * from bankUser where username = 'sebenner' and passwrd = 'pass5';
 
 commit;
