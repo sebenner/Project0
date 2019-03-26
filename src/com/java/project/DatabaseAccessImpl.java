@@ -146,7 +146,6 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 		return false;
 	}
 
-
 	// Singleton necessities:
 	public static DatabaseAccessImpl getInstance() {
 		if (obj == null) {
