@@ -2,6 +2,7 @@ package com.java.project;
 
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Bank {
@@ -75,6 +76,7 @@ public class Bank {
 			
 			Customer c = new Customer(username, password, fullName, address);
 			currUser = c;
+			dai.addUser(c);
 			System.out.println("Thank you for registering");
 		}
 		else {
@@ -103,33 +105,54 @@ public class Bank {
 		//
 		switch (mMChoice) {
 			case 1:			// Apply for Account
-				boolean knownType = false;
 				String type;
-				double deposit;
-				while(!knownType) {
-					//System.out.println("What type of bank account would you like to apply for?");
+				double deposit = 0.0;
+				String jointOwner = "";
+				while(true) {
 					System.out.println("Type of bank account: (Savings, Checking, Joint)");
-					//System.out.println("(Savings, Checking, Joint)");
 					type = scanner.nextLine();
 					if (type.toLowerCase().equals("savings") || type.toLowerCase().equals("checking")) {
-						//dai.addAccount(c, a);()
 						break;
 					}
 					else if (type.toLowerCase().equals("joint")) {
+						while(true) {
+							System.out.println("Who are you sharing this joint account with?");
+							System.out.print("username: ");
+							jointOwner = scanner.nextLine();
+							if (dai.usernameExists(jointOwner) && !jointOwner.equals(currUser.getUsername())) {
+								System.out.println("usertype = " + dai.userType(jointOwner));
+								if (dai.userType(jointOwner).equals("c")) {
+									break;
+								}
+								System.out.println("User is not a customer");
+							}
+							else {
+								System.out.println("Invalid username");
+							}
+						}
 						break;
 					}
 					System.out.println("Invalid bank account type");
 				}
 				while (true) {
 					System.out.println("Initial Deposit:");
-					/*try {
+					try {
 						Double tempDeposit = scanner.nextDouble();
+						scanner.nextLine();
+						if (tempDeposit > 0.0) {
+							deposit = tempDeposit;
+							break;
+						}
+						else {
+							System.out.println("Initial deposit must be greater than 0.");
+						}
 					}
-					catch*/
-						//Double.
-						//Double.parseDouble(tempDeposit);
+					catch (InputMismatchException e){
+						System.out.println("Invalid Input");
+					}
 					break;
 				}
+				dai.addAccount(currUser.getUsername(), type, jointOwner, deposit);
 				break;
 			case 2:			// Withdraw
 				System.out.println("Which account would you like to withdraw from?");
@@ -154,12 +177,13 @@ public class Bank {
 				System.exit(0);
 				break;
 			case 9:			// Approve Accounts
+				dai.pendingAccounts();
 				break;
 			case 10:		// Edit Personal Information
 				break;
 			case 11:		// Edit Account Information
 				break;
-			case 12:		// Cancel Accounts
+			case 12:		// Cancel Accounts // Merge into Edit Account Information
 				break;
 		}
 		
