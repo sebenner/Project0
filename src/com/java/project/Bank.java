@@ -149,17 +149,123 @@ public class Bank {
 			dai.addAccount(currUser.getUsername(), type, jointOwner, deposit);
 			break;
 		case 2: // Withdraw
-			System.out.println("Which account would you like to withdraw from?");
-			System.out.print("Account Id: ");
-			String accId = scanner.nextLine();
-			// TODO print account information if found and is owner of
-			System.out.println("How much would you like to withdraw?");
-			String amount = scanner.nextLine();
-			// TODO call withdraw function in account and update amount in database if valid
+			String accId = "";
+			do {
+				System.out.println("Which account would you like to withdraw from?");
+				System.out.print("Account Id: ");
+				accId = scanner.nextLine();
+				// TODO print account information if found and is owner of
+				// check if account exists
+				if (!dai.accountIdExists(Integer.parseInt(accId))) {
+					System.out.println("That account doesn't exist.");
+				}
+				// check if account is owned by logged in user
+				if (!dai.isAccountOwner(Integer.parseInt(accId), currUser.getUsername())) {
+					System.out.println("You don't own that account.");
+				}
+			} while (!accId.matches("-?\\d+(\\.\\d+)?") && !dai.accountIdExists(Integer.parseInt(accId))
+					&& !dai.isAccountOwner(Integer.parseInt(accId), currUser.getUsername()));
+
+			System.out.println("Account Found.");
+
+			String amount = "";
+			do {
+				System.out.println("How much would you like to withdraw?");
+				amount = scanner.nextLine();
+			} while (!amount.matches("-?\\d+(\\.\\d+)?"));
+
+			Account temp = new Account(Integer.parseInt(accId));
+			try {
+				temp.withdraw(Integer.parseInt(amount));
+			} catch (AccountException e) {
+				System.out.println(e);
+			}
 			break;
 		case 3: // Deposit
+			accId = "";
+			do {
+				System.out.println("Which account would you like to deposit to?");
+				System.out.print("Account Id: ");
+				accId = scanner.nextLine();
+				// TODO print account information if found and is owner of
+				// check if account exists
+				if (!dai.accountIdExists(Integer.parseInt(accId))) {
+					System.out.println("That account doesn't exist.");
+				}
+				// check if account is owned by logged in user
+				if (!dai.isAccountOwner(Integer.parseInt(accId), currUser.getUsername())) {
+					System.out.println("You don't own that account.");
+				}
+			} while (!accId.matches("-?\\d+(\\.\\d+)?") && !dai.accountIdExists(Integer.parseInt(accId))
+					&& !dai.isAccountOwner(Integer.parseInt(accId), currUser.getUsername()));
+
+			System.out.println("Account Found.");
+
+			amount = "";
+			do {
+				System.out.println("How much would you like to deposit?");
+				amount = scanner.nextLine();
+			} while (!amount.matches("-?\\d+(\\.\\d+)?"));
+
+			temp = new Account(Integer.parseInt(accId));
+			try {
+				temp.deposit(Integer.parseInt(amount));
+			} catch (AccountException e) {
+				System.out.println(e);
+			}
 			break;
 		case 4: // Transfer
+			accId = "";
+			do {
+				System.out.println("Which account would you like to transfer FROM?");
+				System.out.print("Account Id: ");
+				accId = scanner.nextLine();
+				// TODO print account information if found and is owner of
+				// check if account exists
+				if (!dai.accountIdExists(Integer.parseInt(accId))) {
+					System.out.println("That account doesn't exist.");
+				}
+				// check if account is owned by logged in user
+				if (!dai.isAccountOwner(Integer.parseInt(accId), currUser.getUsername())) {
+					System.out.println("You don't own that account.");
+				}
+			} while (!accId.matches("-?\\d+(\\.\\d+)?") && !dai.accountIdExists(Integer.parseInt(accId))
+					&& !dai.isAccountOwner(Integer.parseInt(accId), currUser.getUsername()));
+
+			System.out.println("Account Found.");
+
+			String accId2 = "";
+			do {
+				System.out.println("Which account would you like to transfer TO?");
+				System.out.print("Account Id: ");
+				accId2 = scanner.nextLine();
+				// TODO print account information if found and is owner of
+				// check if account exists
+				if (!dai.accountIdExists(Integer.parseInt(accId2))) {
+					System.out.println("That account doesn't exist.");
+				}
+				// check if account is owned by logged in user
+				if (!dai.isAccountOwner(Integer.parseInt(accId2), currUser.getUsername())) {
+					System.out.println("You don't own that account.");
+				}
+			} while (!accId.matches("-?\\d+(\\.\\d+)?") && !dai.accountIdExists(Integer.parseInt(accId))
+					&& !dai.isAccountOwner(Integer.parseInt(accId2), currUser.getUsername()));
+
+			System.out.println("Account Found.");
+
+			amount = "";
+			do {
+				System.out.println("How much would you like to transfer?");
+				amount = scanner.nextLine();
+			} while (!amount.matches("-?\\d+(\\.\\d+)?"));
+
+			temp = new Account(Integer.parseInt(accId));
+			Account temp2 = new Account(Integer.parseInt(accId2));
+			try {
+				temp.transfer(temp2, Integer.parseInt(amount));
+			} catch (AccountException e) {
+				System.out.println(e);
+			}
 			break;
 		case 5: // View Personal Information
 			break;
