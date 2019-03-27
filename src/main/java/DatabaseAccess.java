@@ -40,11 +40,12 @@ public interface DatabaseAccess {
 
 	public void setAmount(Account a) throws SQLException;
 	
-	void updateUser(User u) throws SQLException;
+	public void updateUser(User u) throws SQLException;
 	/*
 	 * public void transfer(); public Account getAccountInformation(); public void
 	 * getAccountBalances(); public void getPersonalInformation(); public void
 	 * editPersonalInformation(); public void editAccountInformation(); public void
 	 * deleteAccount(Object o); public List<Integer> getaccounts(String username);
 	 */
+
 }
