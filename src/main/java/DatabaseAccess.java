@@ -44,4 +44,8 @@ public interface DatabaseAccess {
 	 * deleteAccount(Object o); public List<Integer> getaccounts(String username);
 	 */
 
+	void updateUser(User u) throws SQLException;
+
+	void setAmount(Account a) throws SQLException;
+
 }

@@ -20,7 +20,7 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 	static {
 		try {
 			Properties property = new Properties();
-			property.load(new FileReader(".\\resources\\project.properties"));
+			property.load(new FileReader(".\\src\\main\\resources\\project.properties"));
 			// System.out.println(property.getProperty("driver"));
 			url = property.getProperty("url");
 			username = property.getProperty("username");
@@ -128,8 +128,8 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 	}
 
 	@Override
-	public List<Account> returnAccountsByUsername(String userName) throws SQLException{
-		Connection con DriverManager.getConnection(url, username, password);
+	public List<Account> returnAccountsByUsername(String userName) throws SQLException {
+		Connection con = DriverManager.getConnection(url, username, password);
 		PreparedStatement st = con.prepareStatement("select customeraccounts.accid, useraccount.acctype, useraccount.amount from customeraccounts left join useraccount on useraccount.accid = customeraccounts.accid where customeraccounts.username = ?;");
 		st.setString(1, userName);
 		ResultSet output =st.executeQuery();

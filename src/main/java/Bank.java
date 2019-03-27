@@ -277,7 +277,7 @@ public class Bank {
 			}
 			break;
 		case 5: // View Personal Information
-			System.out.println(this.currUser);	
+			System.out.println(currUser);	
 			break;
 		case 6: // View Account Balances
 			accId = "";
@@ -303,7 +303,7 @@ public class Bank {
 			break;
 		case 7: // View Account Info
 			List<Account> accounts = DatabaseAccessImpl.getInstance()
-					.returnAccountsByUsername(this.currUser.getUsername());
+					.returnAccountsByUsername(currUser.getUsername());
 			for (Account a : accounts) {
 				System.out.println(a);
 			}
