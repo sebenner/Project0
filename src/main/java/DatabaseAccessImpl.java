@@ -20,7 +20,7 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 	static {
 		try {
 			Properties property = new Properties();
-			property.load(new FileReader(".\\resources\\project.properties"));
+			property.load(new FileReader(".\\src\\main\\resources\\project.properties"));
 			// System.out.println(property.getProperty("driver"));
 			url = property.getProperty("url");
 			username = property.getProperty("username");
