@@ -6,7 +6,6 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
 public class Employee extends User {	
 	
 	public Employee(String username, String password, String name, String address) {

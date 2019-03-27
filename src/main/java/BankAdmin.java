@@ -6,7 +6,6 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
 public class BankAdmin extends Employee{
 	//private static final long serialVersionUID = 1L;
 

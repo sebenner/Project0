@@ -138,7 +138,7 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 		List<Account> list = new ArrayList<Account>();
 		if(output.next()){
 			do{
-				temp = new Account(output.getInt("accid"), output.getString("acctype"), output.getDouble("amount"));
+				temp = new Account(output.getInt("accid"), output.getString("acctype"), output.getDouble("amount"), output.getString("status"));
 				list.add(temp);
 			}while(output.next());
 		}

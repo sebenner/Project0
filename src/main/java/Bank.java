@@ -126,24 +126,40 @@ public class Bank {
 			System.out.println(currUser);	
 			break;
 		case 6: // View Account Balances
-			String accId = "";
+			String accIdStr = "";
+			int accId = -1;
+			boolean isNumber = false, accountExists = false, isOwner = false;
 			do {
+				isNumber = false;
+				accountExists = false;
+				isOwner = false;
 				System.out.println("Which account balance would you like to view?");
 				System.out.print("Account Id: ");
-				accId = scanner.nextLine();
+				accIdStr = scanner.nextLine();
+				try {
+					accId = Integer.parseInt(accIdStr);
+					isNumber = true;
+				}
+				catch (NumberFormatException e){
+					System.out.println("Invalid Input");
+				}
 				// check if account exists
-				if (!dai.accountIdExists(Integer.parseInt(accId))) {
+				accountExists = dai.accountIdExists(accId);
+				if (accountExists) {
+					// check if account is owned by logged in user
+					isOwner = dai.isAccountOwner(accId, currUser.getUsername()) ||
+								(currUser instanceof BankAdmin) || (currUser instanceof Employee);
+					if (!isOwner) {
+						System.out.println("You don't own that account.");
+						}
+				}
+				else {
 					System.out.println("That account doesn't exist.");
 				}
-				// check if account is owned by logged in user
-				if (!dai.isAccountOwner(Integer.parseInt(accId), currUser.getUsername())) {
-					System.out.println("You don't own that account.");
-				}
-			} while (!accId.matches("-?\\d+(\\.\\d+)?") && !dai.accountIdExists(Integer.parseInt(accId))
-					&& !dai.isAccountOwner(Integer.parseInt(accId), currUser.getUsername()));
-			if (!dai.checkAccountBalance(Integer.parseInt(accId), true)) {
+			} while (!isNumber || !accountExists || !isOwner);
+			if (!dai.checkAccountBalance(accId, true)) {
 				System.out.println("Status of Account: "
-						+ DatabaseAccessImpl.getInstance().checkAccountStatus(Integer.parseInt(accId)));
+						+ DatabaseAccessImpl.getInstance().checkAccountStatus(accId));
 			}
 			break;
 		case 7: // View Account Info
@@ -353,17 +369,6 @@ public class Bank {
 			}
 
 		} while (!isNumber || !accountExists || !isOwner);
-			// check if account exists
-			//if (!dai.accountIdExists(Integer.parseInt(accId))) {
-			//	System.out.println("That account doesn't exist.");
-			//}
-			// check if account is owned by logged in user
-			//if (!dai.isAccountOwner(Integer.parseInt(accId), currUser.getUsername())/* ||
-			//	!(currUser instanceof BankAdmin)*/) {
-			//	System.out.println("You don't own that account.");
-			//}
-		//} while (!accId.matches("-?\\d+(\\.\\d+)?") && !dai.accountIdExists(Integer.parseInt(accId))
-		//		&& !dai.isAccountOwner(Integer.parseInt(accId), currUser.getUsername()));
 
 		System.out.println("Account Found.");
 
@@ -387,29 +392,13 @@ public class Bank {
 			accountExists = dai.accountIdExists(accId2);
 			if (accountExists) {
 				// check if account is owned by logged in user
-				/*isOwner = dai.isAccountOwner(accId2, currUser.getUsername()) ||
-							(currUser instanceof BankAdmin);
-				if (!isOwner) {
-					System.out.println("You don't own that account.");
-					}*/
 			}
 			else {
 				System.out.println("That account doesn't exist.");
 			}
 
 		} while (!isNumber || !accountExists);
-		/*
-			// check if account exists
-			if (!dai.accountIdExists(Integer.parseInt(accId2))) {
-				System.out.println("That account doesn't exist.");
-			}
-			// check if account is owned by logged in user
-			if (!dai.isAccountOwner(Integer.parseInt(accId2), currUser.getUsername())) {
-				System.out.println("You don't own that account.");
-			}
-		} while (!accId.matches("-?\\d+(\\.\\d+)?") && !dai.accountIdExists(Integer.parseInt(accId))
-				&& !dai.isAccountOwner(Integer.parseInt(accId2), currUser.getUsername()));
-*/
+
 		System.out.println("Account Found.");
 
 		amount = "";
@@ -430,11 +419,11 @@ public class Bank {
 		List<Account> pendingList = dai.pendingAccounts();
 		ListIterator<Account> lIterator = pendingList.listIterator();
 		while (lIterator.hasNext()) {
-			logger.debug("Iterator loop");
+			//logger.debug("Iterator loop");
 			Account currAccount = lIterator.next();
 			String decision;
 			while(true) {
-				logger.debug("Approve/Deny loop");
+				//logger.debug("Approve/Deny loop");
 				System.out.println(currAccount);
 				System.out.println("1. Approve");
 				System.out.println("2. Deny");
