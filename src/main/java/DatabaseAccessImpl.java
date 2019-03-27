@@ -1,6 +1,5 @@
-package com.java.project;
 
-import java.io.*;
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.CallableStatement;
@@ -40,6 +39,7 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 	@Override
 	public void addUser(Customer c) throws SQLException {
 		Connection con = DriverManager.getConnection(url, username, password);
+		System.out.println(con.getAutoCommit());
 		PreparedStatement st = con.prepareStatement(
 				"insert into bankUser (username, passwrd, userType, fullName, address) values (?,?,?,?,?)");
 		st.setString(1, c.getUsername());
@@ -66,14 +66,21 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 	}
 
 	@Override
-	public User login(String uName, String passwrd) throws SQLException {
+	public User login(String uName, String passwrd, boolean isAdmin) throws SQLException {
 		Connection con = DriverManager.getConnection(url, username, password);
-		PreparedStatement st = con.prepareStatement("select * from bankUser where username = ? and passwrd = ?");
-		st.setString(1, uName);
-		st.setString(2, passwrd);
+		PreparedStatement st;
+		if (!isAdmin) {
+			st = con.prepareStatement("select * from bankUser where username = ? and passwrd = ?");
+			st.setString(1, uName);
+			st.setString(2, passwrd);
+		}
+		else {
+			st = con.prepareStatement("select * from bankUser where username = ?");
+			st.setString(1, uName);
+		}
 		ResultSet output = st.executeQuery();
 		if (output.next()) {
-			User temp = User.getInstance(uName, passwrd, output.getString(3), output.getString(4), output.getString(5));
+			User temp = User.getInstance(uName, output.getString(2), output.getString(3), output.getString(4), output.getString(5));
 			con.close();
 			return temp;
 		} else {
@@ -88,8 +95,7 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 		PreparedStatement st = con.prepareStatement("select * from bankUser where username = ?");
 		st.setString(1, uName);
 		ResultSet output = st.executeQuery();
-		// con.close();
-		return output.next();// output.getString("username").isEmpty();
+		return output.next();
 	}
 
 	@Override
@@ -280,18 +286,62 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 		Connection con = DriverManager.getConnection(url, username, password);
 		PreparedStatement st = con.prepareStatement("select * from userAccount where status = 'pending'");
 		ResultSet output = st.executeQuery();
-		output.next();
-		System.out.println(output.getString(1));
-		System.out.println(output.getString(2));
-		System.out.println(output.getString(3));
-		System.out.println(output.getString(4));
-		System.out.println(output.getString(5));
-		output.next();
-		System.out.println(output.getString(1));
-		System.out.println(output.getString(2));
-		System.out.println(output.getString(3));
-		System.out.println(output.getString(4));
-		return null;
+		List<Account> pendingList = new ArrayList<>();
+		while(output.next()) {
+			pendingList.add(new Account(output.getInt(1),output.getString(2),
+										output.getDouble(3),output.getString(4)));
+		}
+		return pendingList;
 	}
 
+	@Override
+	public void setStatus(Account a) throws SQLException {
+		Connection con = DriverManager.getConnection(url, username, password);
+		PreparedStatement st = con.prepareStatement(
+				"update userAccount set status = ? where accId = ?");
+		st.setString(1, a.getStatus());
+		st.setInt(2, a.getAccountId());
+		st.executeUpdate();
+		con.close();
+	}
+
+	@Override
+	public Account getAccount(int accountNum) throws SQLException {
+		Connection con=DriverManager.getConnection(url, username, password);
+		PreparedStatement st = con.prepareStatement("select * from userAccount where accId = ?");
+		st.setInt(1, accountNum);
+		ResultSet output = st.executeQuery();
+		if (output.next()) {
+			return new Account(output.getInt(1),output.getString(2),
+					output.getDouble(3),output.getString(4));
+		}
+		else {
+			return null;
+		}
+	}
+
+	@Override
+	public void setAmount(Account a) throws SQLException {
+		Connection con = DriverManager.getConnection(url, username, password);
+		PreparedStatement st = con.prepareStatement(
+				"update userAccount set amount = ? where accId = ?");
+		st.setDouble(1, a.getAmount());
+		st.setInt(2, a.getAccountId());
+		st.executeUpdate();
+		con.close();
+		
+	}
+
+	@Override
+	public void updateUser(User u) throws SQLException {
+		Connection con = DriverManager.getConnection(url, username, password);
+		PreparedStatement st = con.prepareStatement(
+				"update bankUser set passwrd = ?, fullname = ?, address = ? where username = ?");
+		st.setString(1, u.getPassword());
+		st.setString(2, u.getFullName());
+		st.setString(3, u.getAddress());
+		st.setString(4, u.getUsername());
+		st.executeUpdate();
+		con.close();
+	}
 }

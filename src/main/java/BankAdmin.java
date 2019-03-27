@@ -1,4 +1,4 @@
-package com.java.project;
+
 
 import lombok.Getter;
 import lombok.Setter;
@@ -25,8 +25,7 @@ public class BankAdmin extends Employee{
 		System.out.println("7. Edit Personal Information");
 		System.out.println("8. Edit Account Information");
 		System.out.println("9. Approve Accounts");
-		System.out.println("10. Cancel Accounts");
-		System.out.println("11. Exit");
+		System.out.println("10. Exit");
 	}
 
 	@Override
@@ -51,11 +50,9 @@ public class BankAdmin extends Employee{
 		case 9:
 			return 9;
 		case 10:
-			return 12;
-		case 11:
 			return 8;
 		default:
-			throw new MainMenuException("Nope");
+			throw new MainMenuException("Invalid Input");
 		}
 	}
 }

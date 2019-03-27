@@ -1,4 +1,4 @@
-package com.java.project;
+
 
 import lombok.Getter;
 import lombok.Setter;
@@ -40,7 +40,7 @@ public class Employee extends User {
 		case 5:
 			return 8;
 		default:
-			throw new MainMenuException("Nope");
+			throw new MainMenuException("Invalid Input");
 		}
 	}
 }

@@ -1,13 +1,19 @@
-package com.java.project;
+
 
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.InputMismatchException;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Scanner;
 
+import org.apache.log4j.Logger;
+
 public class Bank {
+	static Logger logger = Logger.getLogger(Bank.class);
 	public static void main(String[] args) throws SQLException {
 		DatabaseAccessImpl dai = DatabaseAccessImpl.getInstance();
+
 		// Customer c1 = new Customer("sebenner","pass5","Steven Benner","701 S.
 		// Nedderman Dr., Arlington, Texas 76019");
 		InputStream stream = System.in;
@@ -36,7 +42,7 @@ public class Bank {
 				username = scanner.nextLine();
 				System.out.print("Password: ");
 				password = scanner.nextLine();
-				User tempUser = dai.login(username, password);
+				User tempUser = dai.login(username, password, false);
 				if (tempUser != null) {
 					currUser = tempUser;
 					break;
@@ -84,16 +90,18 @@ public class Bank {
 			System.exit(0);
 		}
 
-		currUser.printMainMenu();
+		while (true) {
 
 		int mMChoice = 0;
 		while (true) {
+			currUser.printMainMenu();
+
 			try {
 				String tempMMChoice = scanner.nextLine();
 				if (tempMMChoice.equals("1") || tempMMChoice.equals("2") || tempMMChoice.equals("3")
 						|| tempMMChoice.equals("4") || tempMMChoice.equals("5") || tempMMChoice.equals("6")
 						|| tempMMChoice.equals("7") || tempMMChoice.equals("8") || tempMMChoice.equals("9")
-						|| tempMMChoice.equals("10") || tempMMChoice.equals("11")) {
+						|| tempMMChoice.equals("10")) {
 					mMChoice = currUser.menuItemNumber(Integer.parseInt(tempMMChoice));
 					break;
 				}
@@ -147,6 +155,7 @@ public class Bank {
 				break;
 			}
 			dai.addAccount(currUser.getUsername(), type, jointOwner, deposit);
+			System.out.println("Bank Account created");
 			break;
 		case 2: // Withdraw
 			String accId = "";
@@ -300,21 +309,146 @@ public class Bank {
 			}
 			break;
 		case 8: // Exit
+			scanner.close();
 			System.exit(0);
 			break;
 		case 9: // Approve Accounts
+			List<Account> pendingList = dai.pendingAccounts();
+			ListIterator<Account> lIterator = pendingList.listIterator();
+			while (lIterator.hasNext()) {
+				logger.debug("Iterator loop");
+				Account currAccount = lIterator.next();
+				String decision;
+				while(true) {
+					logger.debug("Approve/Deny loop");
+					System.out.println(currAccount);
+					System.out.println("1. Approve");
+					System.out.println("2. Deny");
+					decision = scanner.nextLine();
+					if (decision.equals("1")) {
+						currAccount.setStatus("active");
+						break;
+					}
+					else if (decision.equals("2")) {
+						currAccount.setStatus("denied");
+						break;
+					}
+					System.out.println("Invalid Input");
+				}
+				dai.setStatus(currAccount);
+			}
 			break;
 		case 10: // Edit Personal Information
+			while (true) {
+				System.out.println("Which personal account do you want to edit?");
+				System.out.print("Username: ");
+				String uName = scanner.nextLine();
+				User changeUser = dai.login(uName, "", true);
+				boolean userChanged = false;
+				if (changeUser != null) {
+					boolean returnToMM = false;
+					while (!returnToMM) {
+						System.out.println("1. Change Password");
+						System.out.println("2. Change Full Name");
+						System.out.println("3. Change Adress");
+						System.out.println("4. Return to main menu");
+						String pChoiceStr = scanner.nextLine();
+						if (pChoiceStr.equals("1") || pChoiceStr.equals("2") || pChoiceStr.equals("3")
+								|| pChoiceStr.equals("4")) {
+							int pChoice = Integer.parseInt(pChoiceStr);
+							switch (pChoice) {
+							case 1:
+								System.out.print("Password: ");
+								String newPassword = scanner.nextLine();
+								changeUser.setPassword(newPassword);
+								userChanged = true;
+								break;
+							case 2:
+								System.out.print("Full Name: ");
+								String newFullName = scanner.nextLine();
+								changeUser.setFullName(newFullName);
+								userChanged = true;
+								break;
+							case 3:
+								System.out.print("Address: ");
+								String newAddress = scanner.nextLine();
+								changeUser.setAddress(newAddress);
+								userChanged = true;
+								break;
+							case 4:
+								returnToMM = true;
+								break;
+							}
+						}
+						else {
+							System.out.println("Invalid Input");
+						}
+					}
+					if (userChanged) {
+						dai.updateUser(changeUser);
+					}
+					break;
+				}
+				else {
+					System.out.println("Username not found");
+				}
+			}
 			break;
 		case 11: // Edit Account Information
-			break;
-		case 12: // Cancel Accounts
+			Account currAcc;
+			while(true) {
+				System.out.println("Which bank account do you want to edit?");
+				System.out.print("Account ID: ");
+				String accId3String = scanner.nextLine();
+				int accId3=0;
+				boolean valid = true;
+				try {
+					accId3 = Integer.parseInt(accId3String);
+				}
+				catch (NumberFormatException e){
+					valid = false;
+					System.out.println("Invalid input");
+				}
+				if (valid) {
+					currAcc = dai.getAccount(accId3);
+					if (currAcc != null) {
+						while(true) {
+							System.out.println(currAcc.toString());
+							System.out.println("What status do you want to change the account to?");
+							System.out.println("(active, frozen, closed)");
+							String newStatus = scanner.nextLine();
+							if (newStatus.toLowerCase().equals("active") || newStatus.toLowerCase().equals("frozen"))
+								{
+								currAcc.setStatus(newStatus);
+								dai.setStatus(currAcc);
+								break;
+							}
+							else if (newStatus.toLowerCase().equals("closed")){
+								currAcc.setAmount(0);
+								dai.setAmount(currAcc);
+								currAcc.setStatus(newStatus);
+								dai.setStatus(currAcc);
+								break;
+							}
+							else {
+								System.out.println("Invalid Input");
+							}
+						}
+						
+						break;
+					}
+					else {
+						System.out.println("Account Id not found");
+					}
+				}
+			}
+			
 			break;
 		}
-
+		}
 		// System.out.println(currUser);
 
-		scanner.close();
+		//scanner.close();
 	}
 }
 

@@ -1,4 +1,4 @@
-package com.java.project;
+
 
 import lombok.Getter;
 import lombok.Setter;
@@ -34,7 +34,7 @@ public class Customer extends User{
 			return x;
 		}
 		else {
-			throw new MainMenuException("Nope");
+			throw new MainMenuException("Invalid Input");
 		}
 	}
 }

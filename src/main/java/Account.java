@@ -1,17 +1,19 @@
-package com.java.project;
+
 
 import java.sql.SQLException;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+@AllArgsConstructor
 @Getter
 @Setter
 @ToString
 public class Account {
 	private int accountId;
-	private String type; // change to enum
+	private String type;
 	private double amount;
 	private String status;
 
@@ -58,7 +60,6 @@ public class Account {
 	}
 
 	public void deposit(float newDeposit) throws AccountException {
-		double newAmount = amount + newDeposit;
 		if (newDeposit < 0) {
 			throw new AccountException("You cannot deposit a negative amount of money.");
 		} else if (newDeposit == 0) {
