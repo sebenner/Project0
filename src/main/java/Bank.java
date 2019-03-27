@@ -126,32 +126,10 @@ public class Bank {
 			System.out.println(currUser);	
 			break;
 		case 6: // View Account Balances
-			String accId = "";
-			do {
-				System.out.println("Which account balance would you like to view?");
-				System.out.print("Account Id: ");
-				accId = scanner.nextLine();
-				// check if account exists
-				if (!dai.accountIdExists(Integer.parseInt(accId))) {
-					System.out.println("That account doesn't exist.");
-				}
-				// check if account is owned by logged in user
-				if (!dai.isAccountOwner(Integer.parseInt(accId), currUser.getUsername())) {
-					System.out.println("You don't own that account.");
-				}
-			} while (!accId.matches("-?\\d+(\\.\\d+)?") && !dai.accountIdExists(Integer.parseInt(accId))
-					&& !dai.isAccountOwner(Integer.parseInt(accId), currUser.getUsername()));
-			if (!dai.checkAccountBalance(Integer.parseInt(accId), true)) {
-				System.out.println("Status of Account: "
-						+ DatabaseAccessImpl.getInstance().checkAccountStatus(Integer.parseInt(accId)));
-			}
+			viewBalance();
 			break;
 		case 7: // View Account Info
-			List<Account> accounts = DatabaseAccessImpl.getInstance()
-					.returnAccountsByUsername(currUser.getUsername());
-			for (Account a : accounts) {
-				System.out.println(a);
-			}
+			viewAllAccounts();
 			break;
 		case 8: // Exit
 			scanner.close();
@@ -164,8 +142,7 @@ public class Bank {
 			editPersonalInfo(dai, scanner);
 			break;
 		case 11: // Edit Account Information
-			editAccountInfo(dai, scanner);
-			
+			editAccountInfo(dai, scanner);			
 			break;
 		}
 		}
@@ -409,7 +386,7 @@ public class Bank {
 			}
 		} while (!accId.matches("-?\\d+(\\.\\d+)?") && !dai.accountIdExists(Integer.parseInt(accId))
 				&& !dai.isAccountOwner(Integer.parseInt(accId2), currUser.getUsername()));
-*/
+		*/
 		System.out.println("Account Found.");
 
 		amount = "";
@@ -424,6 +401,34 @@ public class Bank {
 			temp.transfer(temp2, Float.parseFloat(amount));
 		} catch (AccountException e) {
 			System.out.println(e);
+		}
+	}
+	public static void viewBalance()throws SQLException{
+		String accId = "";
+		do {
+			System.out.println("Which account balance would you like to view?");
+			System.out.print("Account Id: ");
+			accId = scanner.nextLine();
+			// check if account exists
+			if (!dai.accountIdExists(Integer.parseInt(accId))) {
+				System.out.println("That account doesn't exist.");
+			}
+			// check if account is owned by logged in user
+			if (!dai.isAccountOwner(Integer.parseInt(accId), currUser.getUsername())) {
+				System.out.println("You don't own that account.");
+			}
+		} while (!accId.matches("-?\\d+(\\.\\d+)?") && !dai.accountIdExists(Integer.parseInt(accId))
+				&& !dai.isAccountOwner(Integer.parseInt(accId), currUser.getUsername()));
+		if (!dai.checkAccountBalance(Integer.parseInt(accId), true)) {
+			System.out.println("Status of Account: "
+					+ DatabaseAccessImpl.getInstance().checkAccountStatus(Integer.parseInt(accId)));
+		}
+	}
+	public static void viewAllAccounts() throws SQLException{
+		List<Account> accounts = DatabaseAccessImpl.getInstance()
+		.returnAccountsByUsername(currUser.getUsername());
+		for (Account a : accounts) {
+			System.out.println(a);
 		}
 	}
 	public static void approveAccounts(DatabaseAccessImpl dai, Scanner scanner) throws SQLException {

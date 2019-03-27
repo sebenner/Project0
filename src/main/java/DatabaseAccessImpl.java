@@ -130,7 +130,7 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 	@Override
 	public List<Account> returnAccountsByUsername(String userName) throws SQLException{
 		Connection con = DriverManager.getConnection(url, username, password);
-		PreparedStatement st = con.prepareStatement("select customeraccounts.accid, useraccount.acctype, useraccount.amount from customeraccounts left join useraccount on useraccount.accid = customeraccounts.accid where customeraccounts.username = ?");
+		PreparedStatement st = con.prepareStatement("select customeraccounts.accid, useraccount.acctype, useraccount.amount, useraccount.status from customeraccounts left join useraccount on useraccount.accid = customeraccounts.accid where customeraccounts.username = ?");
 		st.setString(1, userName);
 		ResultSet output =st.executeQuery();
 
@@ -138,7 +138,8 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 		List<Account> list = new ArrayList<Account>();
 		if(output.next()){
 			do{
-				temp = new Account(output.getInt("accid"), output.getString("acctype"), output.getDouble("amount"));
+				temp = new Account(output.getInt("accid"), output.getString("acctype"), output.getDouble("amount"),
+						output.getString("status"));
 				list.add(temp);
 			}while(output.next());
 		}
