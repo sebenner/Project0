@@ -27,7 +27,7 @@ create sequence accIdSeq
 create table userAccount (
     accId number(10) primary key,
     accType varchar(10),
-    amount number(10),
+    amount float(10),
     status varchar(50)
 );
 
@@ -41,19 +41,17 @@ values ('matt','pass2', 'e','Mathew Schweigardt','701 S. Nedderman Dr., Arlingto
 
 
 create or replace procedure proc1 (username in varchar2, accType in varchar2, username2 in varchar2,
-                                    amount in number)
+                                    amount in float)
 is
 accId number(10) := accIdSeq.nextVal;
 begin
-insert into customerAccounts values (username, accId);
-insert into userAccount values (accId, accType, amount, 'pending');
-if username2 != '' then
-insert into customerAccounts values (username2, accId);
-end if;
-
+    insert into customerAccounts values (username, accId);
+    insert into userAccount values (accId, accType, amount, 'pending');
+    if length(username2) != 0
+    then
+        insert into customerAccounts values (username2, accId);
+    end if;
 end proc1;
-
-
 
 --select * from bankUser;
 
@@ -65,6 +63,10 @@ end proc1;
 
 --select userType from bankUser where username = 'matt';
 
+-- accId, accType, amount
 
+--select * from userAccount where status = 'pending'
+
+--update userAccount set status = 'pending' where accId = 0
 
 --commit;

@@ -45,16 +45,13 @@ create or replace procedure proc1 (username in varchar2, accType in varchar2, us
 is
 accId number(10) := accIdSeq.nextVal;
 begin
-    insert into customerAccount values (username, accId);
+    insert into customerAccounts values (username, accId);
     insert into userAccount values (accId, accType, amount, 'pending');
     if length(username2) != 0
     then
-        dbms_output.put_line('reee');
         insert into customerAccounts values (username2, accId);
     end if;
 end proc1;
-
-exec proc1('jijiji', 'Savings', '', 30.78);
 
 --select * from bankUser;
 
@@ -66,6 +63,10 @@ exec proc1('jijiji', 'Savings', '', 30.78);
 
 --select userType from bankUser where username = 'matt';
 
+-- accId, accType, amount
 
+--select * from userAccount where status = 'pending'
+
+--update userAccount set status = 'Active' where accId = 1
 
 --commit;

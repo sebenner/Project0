@@ -3,11 +3,17 @@ package com.java.project;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.InputMismatchException;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Scanner;
 
+import org.apache.log4j.Logger;
+
 public class Bank {
+	static Logger logger = Logger.getLogger(Bank.class);
 	public static void main(String[] args) throws SQLException {
 		DatabaseAccessImpl dai = DatabaseAccessImpl.getInstance();
+
 		// Customer c1 = new Customer("sebenner","pass5","Steven Benner","701 S.
 		// Nedderman Dr., Arlington, Texas 76019");
 		InputStream stream = System.in;
@@ -147,6 +153,7 @@ public class Bank {
 				break;
 			}
 			dai.addAccount(currUser.getUsername(), type, jointOwner, deposit);
+			System.out.println("Bank Account created");
 			break;
 		case 2: // Withdraw
 			System.out.println("Which account would you like to withdraw from?");
@@ -171,10 +178,81 @@ public class Bank {
 			System.exit(0);
 			break;
 		case 9: // Approve Accounts
+			List<Account> pendingList = dai.pendingAccounts();
+			ListIterator<Account> lIterator = pendingList.listIterator();
+			while (lIterator.hasNext()) {
+				logger.debug("Iterator loop");
+				Account currAccount = lIterator.next();
+				String decision;
+				while(true) {
+					logger.debug("Approve/Deny loop");
+					System.out.println(currAccount);
+					System.out.println("1. Approve");
+					System.out.println("2. Deny");
+					decision = scanner.nextLine();
+					if (decision.equals("1")) {
+						currAccount.setStatus("Active");
+						break;
+					}
+					else if (decision.equals("2")) {
+						currAccount.setStatus("Denied");
+						break;
+					}
+					System.out.println("Invalid Input");
+				}
+				dai.setStatus(currAccount);
+			}
 			break;
 		case 10: // Edit Personal Information
 			break;
 		case 11: // Edit Account Information
+			Account currAcc;
+			while(true) {
+				System.out.println("Which account do you want to edit?");
+				System.out.print("Account ID: ");
+				String accId2String = scanner.nextLine();
+				int accId2=0;
+				boolean valid = true;
+				try {
+					accId2 = Integer.parseInt(accId2String);
+				}
+				catch (NumberFormatException e){
+					valid = false;
+					System.out.println("Invalid input");
+				}
+				if (valid) {
+					currAcc = dai.getAccount(accId2);
+					if (currAcc != null) {
+						while(true) {
+							System.out.println(currAcc.toString());
+							System.out.println("What status do you want to change the account to?");
+							System.out.println("(active, frozen, closed)");
+							String newStatus = scanner.nextLine();
+							if (newStatus.toLowerCase().equals("active") || newStatus.toLowerCase().equals("frozen"))
+								{
+								currAcc.setStatus(newStatus);
+								dai.setStatus(currAcc);
+								break;
+							}
+							else if (newStatus.toLowerCase().equals("closed")){
+								currAcc.setStatus(newStatus);
+								dai.setStatus(currAcc);
+								//TODO dai.setAmount
+								break;
+							}
+							else {
+								System.out.println("Invalid Input");
+							}
+						}
+						
+						break;
+					}
+					else {
+						System.out.println("Account Id not found");
+					}
+				}
+			}
+			
 			break;
 		case 12: // Cancel Accounts
 			break;

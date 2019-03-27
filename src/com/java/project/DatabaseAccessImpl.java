@@ -9,6 +9,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -179,18 +180,38 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 		Connection con=DriverManager.getConnection(url, username, password);
 		PreparedStatement st = con.prepareStatement("select * from userAccount where status = 'pending'");
 		ResultSet output = st.executeQuery();
-		output.next();
-		System.out.println(output.getString(1));
-		System.out.println(output.getString(2));
-		System.out.println(output.getString(3));
-		System.out.println(output.getString(4));
-		System.out.println(output.getString(5));
-		output.next();
-		System.out.println(output.getString(1));
-		System.out.println(output.getString(2));
-		System.out.println(output.getString(3));
-		System.out.println(output.getString(4));
-		return null;
+		List<Account> pendingList = new ArrayList<>();
+		while(output.next()) {
+			pendingList.add(new Account(output.getInt(1),output.getString(2),
+										output.getDouble(3),output.getString(4)));
+		}
+		return pendingList;
+	}
+
+	@Override
+	public void setStatus(Account a) throws SQLException {
+		Connection con = DriverManager.getConnection(url, username, password);
+		PreparedStatement st = con.prepareStatement(
+				"update userAccount set status = ? where accId = ?");
+		st.setString(1, a.getStatus());
+		st.setInt(2, a.getAccountId());
+		st.executeUpdate();
+		con.close();
+	}
+
+	@Override
+	public Account getAccount(int accountNum) throws SQLException {
+		Connection con=DriverManager.getConnection(url, username, password);
+		PreparedStatement st = con.prepareStatement("select * from userAccount where accId = ?");
+		st.setInt(1, accountNum);
+		ResultSet output = st.executeQuery();
+		if (output.next()) {
+			return new Account(output.getInt(1),output.getString(2),
+					output.getDouble(3),output.getString(4));
+		}
+		else {
+			return null;
+		}
 	}
 
 }

@@ -2,10 +2,12 @@ package com.java.project;
 
 import java.sql.SQLException;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+@AllArgsConstructor
 @Getter
 @Setter
 @ToString

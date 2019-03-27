@@ -18,6 +18,10 @@ public interface DatabaseAccess {
 	
 	public List<Account> pendingAccounts() throws SQLException;
 	
+	public void setStatus(Account a) throws SQLException;
+	
+	public Account getAccount(int accountNum) throws SQLException;
+	
 	public boolean withdraw(float amount, int accountNum) throws SQLException;
 
 	public boolean deposit(float amount, int accountNum) throws SQLException;
