@@ -67,6 +67,6 @@ end proc1;
 
 --select * from userAccount where status = 'pending'
 
---update userAccount set status = 'pending' where accId = 0
+--update userAccount set status = 'Active' where accId = 1
 
 --commit;

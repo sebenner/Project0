@@ -1,6 +1,5 @@
 package com.java.project;
 
-import java.io.*;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.CallableStatement;
@@ -21,8 +20,9 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 	static {
 		try {
 			Properties property = new Properties();
-			property.load(new FileReader("C:\\Users\\steve\\eclipse-workspace-photon\\Project0\\resources\\project.properties"));
-			//System.out.println(property.getProperty("driver"));
+			property.load(new FileReader(
+					"C:\\Users\\steve\\eclipse-workspace-photon\\Project0\\resources\\project.properties"));
+			// System.out.println(property.getProperty("driver"));
 			url = property.getProperty("url");
 			username = property.getProperty("username");
 			password = property.getProperty("password");
@@ -52,7 +52,7 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 
 	@Override
 	public void addAccount(String uName1, String type, String uName2, Double amount) throws SQLException {
-		Connection con=DriverManager.getConnection(url, username, password);
+		Connection con = DriverManager.getConnection(url, username, password);
 		CallableStatement cs = con.prepareCall("call proc1(?,?,?,?)");
 		cs.setString(1, uName1);
 		cs.setString(2, type);
@@ -89,6 +89,35 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 		ResultSet output = st.executeQuery();
 		// con.close();
 		return output.next();// output.getString("username").isEmpty();
+	}
+
+	@Override
+	public boolean accountIdExists(int aNum) throws SQLException {
+		Connection con = DriverManager.getConnection(url, username, password);
+		PreparedStatement st = con.prepareStatement("select * from useraccount where accid = ?");
+		st.setInt(1, aNum);
+		ResultSet output = st.executeQuery();
+		// con.close();
+		return output.next();// output.getString("username").isEmpty();
+	}
+
+	@Override
+	public boolean isAccountOwner(int aNum, String uName) throws SQLException {
+		Connection con = DriverManager.getConnection(url, username, password);
+		PreparedStatement st = con.prepareStatement("select username from customeraccounts where accid=?");
+		st.setInt(1, aNum);
+		ResultSet output = st.executeQuery();
+		boolean owner = false;
+
+		if (output.first()) {
+			do {
+				owner = uName.matches(output.getString("username"));
+				if (owner)
+					break;
+			} while (output.next());
+		}
+		// con.close();
+		return owner;// output.getString("username").isEmpty();
 	}
 
 	@Override
@@ -147,7 +176,6 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 		return false;
 	}
 
-
 	// Singleton necessities:
 	public static DatabaseAccessImpl getInstance() {
 		if (obj == null) {
@@ -167,7 +195,7 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 
 	@Override
 	public String userType(String uName) throws SQLException {
-		Connection con=DriverManager.getConnection(url, username, password);
+		Connection con = DriverManager.getConnection(url, username, password);
 		PreparedStatement st = con.prepareStatement("select userType from bankUser where username = ?");
 		st.setString(1, uName);
 		ResultSet output = st.executeQuery();
@@ -177,7 +205,7 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 
 	@Override
 	public List<Account> pendingAccounts() throws SQLException {
-		Connection con=DriverManager.getConnection(url, username, password);
+		Connection con = DriverManager.getConnection(url, username, password);
 		PreparedStatement st = con.prepareStatement("select * from userAccount where status = 'pending'");
 		ResultSet output = st.executeQuery();
 		List<Account> pendingList = new ArrayList<>();

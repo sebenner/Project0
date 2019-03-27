@@ -13,7 +13,7 @@ import lombok.ToString;
 @ToString
 public class Account {
 	private int accountId;
-	private String type; // change to enum
+	private String type;
 	private double amount;
 	private String status;
 
@@ -22,6 +22,10 @@ public class Account {
 		this.type = type;
 		this.amount = amount;
 		this.status = "Pending Review";
+	}
+
+	public Account(int accountId) {
+		this.accountId = accountId;
 	}
 
 	public String view() {
@@ -34,7 +38,12 @@ public class Account {
 			throw new AccountException("You cannot withdraw a negative amount of money.");
 		} else if (newAmount >= 0.0) {
 			try {
-				DatabaseAccessImpl.getInstance().withdraw(withdrawal, this.getAccountId());
+				boolean succ = DatabaseAccessImpl.getInstance().withdraw(withdrawal, this.getAccountId());
+				if (succ) {
+					System.out.println("Transaction succeeded!");
+				} else {
+					System.out.println("Transaction failed!");
+				}
 			} catch (SQLException e) {
 				throw new AccountException("There seems to be an issue with the Database.");
 			}
@@ -44,13 +53,22 @@ public class Account {
 	}
 
 	public void deposit(float newDeposit) throws AccountException {
-		double newAmount = amount + newDeposit;
 		if (newDeposit < 0) {
 			throw new AccountException("You cannot deposit a negative amount of money.");
 		} else if (newDeposit == 0) {
 			throw new AccountException("Deposits must have quantity.");
 		} else {
-			amount = newAmount;
+			try {
+				boolean succ = DatabaseAccessImpl.getInstance().deposit(newDeposit, this.getAccountId());
+				if (succ) {
+					System.out.println("Transaction succeeded!");
+				} else {
+					System.out.println("Transaction failed!");
+				}
+
+			} catch (SQLException e) {
+				throw new AccountException("There seems to be an issue with the Database.");
+			}
 		}
 	}
 
