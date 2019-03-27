@@ -126,10 +126,10 @@ public class Bank {
 			System.out.println(currUser);	
 			break;
 		case 6: // View Account Balances
-			viewBalance();
+			viewBalance(dai,scanner, currUser);
 			break;
 		case 7: // View Account Info
-			viewAllAccounts();
+				viewAllAccounts(dai,scanner, currUser);
 			break;
 		case 8: // Exit
 			scanner.close();
@@ -403,7 +403,7 @@ public class Bank {
 			System.out.println(e);
 		}
 	}
-	public static void viewBalance()throws SQLException{
+	public static void viewBalance(DatabaseAccessImpl dai,Scanner scanner, User currUser)throws SQLException{
 		String accId = "";
 		do {
 			System.out.println("Which account balance would you like to view?");
@@ -424,7 +424,7 @@ public class Bank {
 					+ DatabaseAccessImpl.getInstance().checkAccountStatus(Integer.parseInt(accId)));
 		}
 	}
-	public static void viewAllAccounts() throws SQLException{
+	public static void viewAllAccounts(DatabaseAccessImpl dai,Scanner scanner, User currUser) throws SQLException{
 		List<Account> accounts = DatabaseAccessImpl.getInstance()
 		.returnAccountsByUsername(currUser.getUsername());
 		for (Account a : accounts) {
