@@ -23,14 +23,21 @@ public interface DatabaseAccess {
 	public boolean deposit(float amount, int accountNum) throws SQLException;
 
 	public boolean accountIdExists(int uNum) throws SQLException;
-	
-	boolean isAccountOwner(int aNum, String uName) throws SQLException;
+
+	public boolean isAccountOwner(int aNum, String uName) throws SQLException;
+
+	public boolean checkAccountBalance(int accountNum, boolean printToScreen) throws SQLException;
+
+	public float returnAccountBalance(int accountNum) throws SQLException;
+
+	public String checkAccountStatus(int accountNum) throws SQLException;
+
+	public List<Account> returnAccountsByUsername(String userName) throws SQLException;
 	/*
 	 * public void transfer(); public Account getAccountInformation(); public void
 	 * getAccountBalances(); public void getPersonalInformation(); public void
 	 * editPersonalInformation(); public void editAccountInformation(); public void
 	 * deleteAccount(Object o); public List<Integer> getaccounts(String username);
 	 */
-
 
 }

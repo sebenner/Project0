@@ -31,16 +31,23 @@ public class Account {
 	}
 
 	public void withdraw(float withdrawal) throws AccountException {
-		double newAmount = amount - withdrawal;
+		float newAmount = 0.0f;
+		try {
+			newAmount = DatabaseAccessImpl.getInstance().returnAccountBalance(this.getAccountId()) - withdrawal;
+		} catch (SQLException e) {
+			throw new AccountException("There seems to be an issue with the Database.");
+		}
+		;
 		if (withdrawal < 0) {
 			throw new AccountException("You cannot withdraw a negative amount of money.");
 		} else if (newAmount >= 0.0) {
 			try {
 				boolean succ = DatabaseAccessImpl.getInstance().withdraw(withdrawal, this.getAccountId());
 				if (succ) {
-					System.out.println("Transaction succeeded!");
+					DatabaseAccessImpl.getInstance().checkAccountBalance(this.getAccountId(), true);
 				} else {
-					System.out.println("Transaction failed!");
+					System.out.println("Transaction Failed. \nStatus of Account: "
+							+ DatabaseAccessImpl.getInstance().checkAccountStatus(this.getAccountId()));
 				}
 			} catch (SQLException e) {
 				throw new AccountException("There seems to be an issue with the Database.");
@@ -60,12 +67,14 @@ public class Account {
 			try {
 				boolean succ = DatabaseAccessImpl.getInstance().deposit(newDeposit, this.getAccountId());
 				if (succ) {
-					System.out.println("Transaction succeeded!");
+					DatabaseAccessImpl.getInstance().checkAccountBalance(this.getAccountId(), true);
 				} else {
-					System.out.println("Transaction failed!");
+					System.out.println("Transaction Failed. \nStatus of Account: "
+							+ DatabaseAccessImpl.getInstance().checkAccountStatus(this.getAccountId()));
 				}
 
 			} catch (SQLException e) {
+				System.out.println(e);
 				throw new AccountException("There seems to be an issue with the Database.");
 			}
 		}
@@ -77,6 +86,7 @@ public class Account {
 		} else {
 			withdraw(tranAmount);
 			toAccount.deposit(tranAmount);
+			System.out.println("Transfer Complete!");
 		}
 	}
 

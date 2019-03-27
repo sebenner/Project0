@@ -176,7 +176,7 @@ public class Bank {
 
 			Account temp = new Account(Integer.parseInt(accId));
 			try {
-				temp.withdraw(Integer.parseInt(amount));
+				temp.withdraw(Float.parseFloat(amount));
 			} catch (AccountException e) {
 				System.out.println(e);
 			}
@@ -209,7 +209,7 @@ public class Bank {
 
 			temp = new Account(Integer.parseInt(accId));
 			try {
-				temp.deposit(Integer.parseInt(amount));
+				temp.deposit(Float.parseFloat(amount));
 			} catch (AccountException e) {
 				System.out.println(e);
 			}
@@ -262,16 +262,42 @@ public class Bank {
 			temp = new Account(Integer.parseInt(accId));
 			Account temp2 = new Account(Integer.parseInt(accId2));
 			try {
-				temp.transfer(temp2, Integer.parseInt(amount));
+				temp.transfer(temp2, Float.parseFloat(amount));
 			} catch (AccountException e) {
 				System.out.println(e);
 			}
 			break;
 		case 5: // View Personal Information
+			System.out.println(this.currUser);	
 			break;
-		case 6: // View Account Information
+		case 6: // View Account Balances
+			accId = "";
+			do {
+				System.out.println("Which account balance would you like to view?");
+				System.out.print("Account Id: ");
+				accId = scanner.nextLine();
+				// TODO print account information if found and is owner of
+				// check if account exists
+				if (!dai.accountIdExists(Integer.parseInt(accId))) {
+					System.out.println("That account doesn't exist.");
+				}
+				// check if account is owned by logged in user
+				if (!dai.isAccountOwner(Integer.parseInt(accId), currUser.getUsername())) {
+					System.out.println("You don't own that account.");
+				}
+			} while (!accId.matches("-?\\d+(\\.\\d+)?") && !dai.accountIdExists(Integer.parseInt(accId))
+					&& !dai.isAccountOwner(Integer.parseInt(accId), currUser.getUsername()));
+			if (!dai.checkAccountBalance(Integer.parseInt(accId), true)) {
+				System.out.println("Status of Account: "
+						+ DatabaseAccessImpl.getInstance().checkAccountStatus(Integer.parseInt(accId)));
+			}
 			break;
-		case 7: // View Account Balances
+		case 7: // View Account Info
+			List<Account> accounts = DatabaseAccessImpl.getInstance()
+					.returnAccountsByUsername(this.currUser.getUsername());
+			for (Account a : accounts) {
+				System.out.println(a);
+			}
 			break;
 		case 8: // Exit
 			System.exit(0);

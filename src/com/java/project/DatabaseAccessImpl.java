@@ -9,6 +9,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -20,8 +21,7 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 	static {
 		try {
 			Properties property = new Properties();
-			property.load(new FileReader(
-					"C:\\Users\\steve\\eclipse-workspace-photon\\Project0\\resources\\project.properties"));
+			property.load(new FileReader(".\\resources\\project.properties"));
 			// System.out.println(property.getProperty("driver"));
 			url = property.getProperty("url");
 			username = property.getProperty("username");
@@ -37,6 +37,7 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 	private DatabaseAccessImpl() {
 	}
 
+	@Override
 	public void addUser(Customer c) throws SQLException {
 		Connection con = DriverManager.getConnection(url, username, password);
 		PreparedStatement st = con.prepareStatement(
@@ -109,7 +110,7 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 		ResultSet output = st.executeQuery();
 		boolean owner = false;
 
-		if (output.first()) {
+		if (output.next()) {
 			do {
 				owner = uName.matches(output.getString("username"));
 				if (owner)
@@ -121,9 +122,29 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 	}
 
 	@Override
+	public List<Account> returnAccountsByUsername(String userName) throws SQLException{
+		Connection con DriverManager.getConnection(url, username, password);
+		PreparedStatement st = con.prepareStatement("select customeraccounts.accid, useraccount.acctype, useraccount.amount from customeraccounts left join useraccount on useraccount.accid = customeraccounts.accid where customeraccounts.username = ?;");
+		st.setString(1, userName);
+		ResultSet output =st.executeQuery();
+
+		Account temp;
+		List<Account> list = new ArrayList<Account>();
+		if(output.next()){
+			do{
+				temp = new Account(output.getInt("accid"), output.getString("acctype"), output.getDouble("amount"));
+				list.add(temp);
+			}while(output.next());
+		}
+
+		return list;
+	}
+
+	@Override
 	public boolean withdraw(float amount, int accountNum) throws SQLException {
 		Connection con = DriverManager.getConnection(url, username, password);
-		PreparedStatement st = con.prepareStatement("select amount from useraccount where acid = ?");
+		PreparedStatement st = con
+				.prepareStatement("select amount from useraccount where accid = ? and status = 'active'");
 		st.setInt(1, accountNum);
 		ResultSet output = st.executeQuery();
 		float balance = 0;
@@ -136,13 +157,14 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 
 		if (balance != 0) {
 			balance = balance - amount;
-			st = con.prepareStatement("update useraccount set amount=? where acid=?");
+			st = con.prepareStatement("update useraccount set amount=? where accid=? and status = 'active'");
 			st.setFloat(1, balance);
 			st.setInt(2, accountNum);
 			st.executeUpdate();
+			obj.returnAccountBalance(accountNum);
 			return true;
 		} else {
-			System.out.println("Account balance 0");
+			obj.returnAccountBalance(accountNum);
 		}
 		con.close();
 		return false;
@@ -151,7 +173,8 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 	@Override
 	public boolean deposit(float amount, int accountNum) throws SQLException {
 		Connection con = DriverManager.getConnection(url, username, password);
-		PreparedStatement st = con.prepareStatement("select amount from useraccount where acid = ?");
+		PreparedStatement st = con
+				.prepareStatement("select amount from useraccount where accid = ? and status = 'active'");
 		st.setInt(1, accountNum);
 		ResultSet output = st.executeQuery();
 		float balance = 0;
@@ -160,20 +183,69 @@ public class DatabaseAccessImpl implements DatabaseAccess, Cloneable {
 			balance = output.getFloat("amount");
 		} else {
 			System.out.println("Account balance not found");
+			con.close();
+			return false;
 		}
 
-		if (balance != 0) {
-			balance = balance + amount;
-			st = con.prepareStatement("update useraccount set amount=? where acid=?");
-			st.setFloat(1, balance);
-			st.setInt(2, accountNum);
-			st.executeUpdate();
-			return true;
-		} else {
-			System.out.println("Account balance 0");
+		balance = balance + amount;
+		st = con.prepareStatement("update useraccount set amount=? where accid=? and status = 'active'");
+		st.setFloat(1, balance);
+		st.setInt(2, accountNum);
+		st.executeUpdate();
+
+		obj.returnAccountBalance(accountNum);
+
+		con.close();
+		return true;
+
+	}
+
+	public boolean checkAccountBalance(int accountNum, boolean printToScreen) throws SQLException {
+		Connection con = DriverManager.getConnection(url, username, password);
+		PreparedStatement st = con
+				.prepareStatement("select amount from useraccount where accid = ? and status = 'active'");
+		st.setInt(1, accountNum);
+		ResultSet output = st.executeQuery();
+
+		if (!output.next()) {
+			System.out.println("Account balance not found");
+			con.close();
+			return false;
+		}
+
+		if (printToScreen) {
+			System.out.printf("\nCurrent Balance of Account: #%d is $%,.2f\n", accountNum, output.getFloat("amount"));
 		}
 		con.close();
-		return false;
+		return true;
+	}
+
+	public float returnAccountBalance(int accountNum) throws SQLException {
+		Connection con = DriverManager.getConnection(url, username, password);
+		PreparedStatement st = con
+				.prepareStatement("select amount from useraccount where accid = ? and status = 'active'");
+		st.setInt(1, accountNum);
+		ResultSet output = st.executeQuery();
+		float balance = 0.0f;
+
+		if (output.next() && this.checkAccountBalance(accountNum, false)) {
+			balance = output.getFloat("amount");
+		}
+
+		return balance;
+	}
+
+	public String checkAccountStatus(int accountNum) throws SQLException {
+		Connection con = DriverManager.getConnection(url, username, password);
+		PreparedStatement st = con.prepareStatement("select status from useraccount where accid = ?");
+		st.setInt(1, accountNum);
+		ResultSet output = st.executeQuery();
+
+		String str = "";
+		if (output.next()) {
+			str = output.getString("status");
+		}
+		return str;
 	}
 
 	// Singleton necessities:
