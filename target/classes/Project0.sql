@@ -37,6 +37,9 @@ values ('payal','pass1', 'b','Payal','701 S. Nedderman Dr., Arlington, Texas 760
 Insert Into bankUser
 values ('matt','pass2', 'e','Mathew Schweigardt','701 S. Nedderman Dr., Arlington, Texas 76019');
 
+
+
+
 create or replace procedure proc1 (username in varchar2, accType in varchar2, username2 in varchar2,
                                     amount in float)
 is
@@ -64,8 +67,10 @@ end proc1;
 
 --select * from userAccount where status = 'pending'
 
---update userAccount set status = 'active' where accId = 2
+--update userAccount set status = 'Active' where accId = 1
 
---select amount from useraccount where accid = 2 and status = 'active'
+--select amount from useraccount where accid = 0
+
+--update bankUser set passwrd = 'new', fullname = 'Eric B', address = '2323 jufhudf' where username = 'ebenner'
 
 --commit;
